@@ -249,15 +249,18 @@ RCT_EXPORT_METHOD(shareImage:(NSDictionary *)data
         callback([NSArray arrayWithObject:@"shareImage: The value of ImageUrl cannot be empty."]);
         return;
     }
-    NSRange range = [imageUrl rangeOfString:@"."];
-    if ( range.length == 0)
-    {
-        callback([NSArray arrayWithObject:@"shareImage: ImageUrl value, Could not find file suffix."]);
-        return;
-    }
+    if ([imageUrl hasPrefix:@"data:"]) {
+           imageUrl = [imageUrl substringFromIndex:[imageUrl rangeOfString:@","].location + 1];
+       }
+    // 根据路径下载图片
+    NSData *decodedImageData = [[NSData alloc]initWithBase64EncodedString:imageUrl options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    UIImage *image = [UIImage imageWithData:decodedImageData];
+//    UIImage *image = [self getImageFromURL:imageUrl];
+    // 从 UIImage 获取图片数据
+
     
     // 根据路径下载图片
-    UIImage *image = [self getImageFromURL:imageUrl];
+//     UIImage *image = [self getImageFromURL:imageUrl];
     // 从 UIImage 获取图片数据
     NSData *imageData = UIImageJPEGRepresentation(image, 1);
     // 用图片数据构建 WXImageObject 对象
